@@ -4,7 +4,7 @@ A small Rails CRM for maintaining people and their contact information.
 
 ## Requirements
 
-- Ruby 3.4.10
+- Ruby 4.0.6
 - Rails 8.1.3.1
 - PostgreSQL 15+
 
