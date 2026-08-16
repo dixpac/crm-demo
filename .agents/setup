@@ -20,7 +20,7 @@ if ! grep -q "$MISE_BIN" "$HOME/.bashrc" 2>/dev/null; then
   echo "eval \"\$($MISE_BIN activate bash)\"" >> "$HOME/.bashrc"
 fi
 
-# Install Ruby from mise.toml (binary-only — never fall back to source compilation)
+# Install Ruby and Node from mise.toml (never compile Ruby from source)
 export MISE_RUBY_COMPILE=false
 mise install
 
@@ -35,4 +35,5 @@ if ! sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname = '$USER'"
 fi
 
 bundle check || bundle install
+npm ci
 bin/rails db:prepare
