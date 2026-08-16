@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+RUBY_VERSION="3.4.10"
+RUBY_PREFIX="/opt/ruby-${RUBY_VERSION}"
+
+if ! command -v psql >/dev/null || [[ ! -x "${RUBY_PREFIX}/bin/ruby" ]]; then
+  sudo apt-get update
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    build-essential curl libffi-dev libgmp-dev libjemalloc-dev libpq-dev \
+    libreadline-dev libssl-dev libyaml-dev pkg-config postgresql \
+    postgresql-contrib zlib1g-dev
+fi
+
+if [[ ! -x "${RUBY_PREFIX}/bin/ruby" ]]; then
+  build_dir="$(mktemp -d "$HOME/ruby-build.XXXXXX")"
+  trap 'rm -rf "$build_dir"' EXIT
+  curl -fsSL "https://cache.ruby-lang.org/pub/ruby/3.4/ruby-${RUBY_VERSION}.tar.gz" |
+    tar -xz -C "$build_dir"
+  pushd "$build_dir/ruby-${RUBY_VERSION}" >/dev/null
+  ./configure --prefix="$RUBY_PREFIX" --disable-install-doc --with-jemalloc
+  make -j"$(nproc)"
+  sudo mkdir -p "$RUBY_PREFIX"
+  sudo chown -R "$(id -u):$(id -g)" "$RUBY_PREFIX"
+  make install-nodoc
+  popd >/dev/null
+fi
+
+for executable in ruby gem bundle bundler; do
+  sudo ln -sf "$RUBY_PREFIX/bin/$executable" "/usr/local/bin/$executable"
+done
+
+sudo pg_ctlcluster 15 main start || true
+if ! sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname = '$USER'" | grep -qx 1; then
+  sudo -u postgres createuser --superuser "$USER"
+fi
+
+bundle check || bundle install
+bin/rails db:prepare

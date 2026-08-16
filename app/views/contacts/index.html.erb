@@ -1,0 +1,45 @@
+<% content_for :title, "Contacts" %>
+
+<div class="page-header">
+  <div>
+    <h1>Contacts</h1>
+    <p class="subtitle"><%= pluralize(@contacts.size, "person") %> in your CRM</p>
+  </div>
+  <%= link_to "Add contact", new_contact_path, class: "button" %>
+</div>
+
+<div class="panel">
+  <% if @contacts.any? %>
+    <table class="contacts-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Contact</th>
+          <th>Company</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @contacts.each do |contact| %>
+          <tr id="<%= dom_id contact %>">
+            <td><%= link_to contact.full_name, contact, class: "contact-name" %></td>
+            <td>
+              <% if contact.email.present? %><%= mail_to contact.email %><br><% end %>
+              <% if contact.phone.present? %><%= link_to contact.phone, "tel:#{contact.phone}" %><% end %>
+            </td>
+            <td>
+              <%= contact.company.presence || "—" %>
+              <% if contact.job_title.present? %><br><span class="subtitle"><%= contact.job_title %></span><% end %>
+            </td>
+            <td><%= link_to "View", contact %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="empty-state">
+      <p>No contacts yet.</p>
+      <%= link_to "Create your first contact", new_contact_path %>
+    </div>
+  <% end %>
+</div>

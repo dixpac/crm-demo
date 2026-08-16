@@ -1,0 +1,79 @@
+<%= form_with(model: contact) do |form| %>
+  <% if contact.errors.any? %>
+    <div class="error-box">
+      <strong><%= pluralize(contact.errors.count, "error") %> prevented this contact from being saved:</strong>
+
+      <ul>
+        <% contact.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-grid">
+    <div>
+      <%= form.label :first_name %>
+      <%= form.text_field :first_name, required: true, autofocus: true %>
+    </div>
+
+    <div>
+      <%= form.label :last_name %>
+      <%= form.text_field :last_name, required: true %>
+    </div>
+
+    <div>
+      <%= form.label :email %>
+      <%= form.email_field :email %>
+    </div>
+
+    <div>
+      <%= form.label :phone %>
+      <%= form.telephone_field :phone %>
+    </div>
+
+    <div>
+      <%= form.label :company %>
+      <%= form.text_field :company %>
+    </div>
+
+    <div>
+      <%= form.label :job_title %>
+      <%= form.text_field :job_title %>
+    </div>
+
+    <div class="field-full">
+      <%= form.label :address %>
+      <%= form.text_field :address %>
+    </div>
+
+    <div>
+      <%= form.label :city %>
+      <%= form.text_field :city %>
+    </div>
+
+    <div>
+      <%= form.label :state %>
+      <%= form.text_field :state %>
+    </div>
+
+    <div>
+      <%= form.label :postal_code %>
+      <%= form.text_field :postal_code %>
+    </div>
+
+    <div>
+      <%= form.label :country %>
+      <%= form.text_field :country %>
+    </div>
+
+    <div class="field-full">
+      <%= form.label :notes %>
+      <%= form.textarea :notes %>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit %>
+  </div>
+<% end %>

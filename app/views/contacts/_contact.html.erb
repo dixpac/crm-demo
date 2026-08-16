@@ -1,0 +1,26 @@
+<dl id="<%= dom_id contact %>" class="detail-grid">
+  <div class="detail-item">
+    <dt>Email</dt>
+    <dd><%= contact.email.present? ? mail_to(contact.email) : "—" %></dd>
+  </div>
+  <div class="detail-item">
+    <dt>Phone</dt>
+    <dd><%= contact.phone.present? ? link_to(contact.phone, "tel:#{contact.phone}") : "—" %></dd>
+  </div>
+  <div class="detail-item">
+    <dt>Company</dt>
+    <dd><%= contact.company.presence || "—" %></dd>
+  </div>
+  <div class="detail-item">
+    <dt>Job title</dt>
+    <dd><%= contact.job_title.presence || "—" %></dd>
+  </div>
+  <div class="detail-item field-full">
+    <dt>Address</dt>
+    <dd><%= [contact.address, contact.city, contact.state, contact.postal_code, contact.country].select(&:present?).join(", ").presence || "—" %></dd>
+  </div>
+  <div class="detail-item field-full">
+    <dt>Notes</dt>
+    <dd class="notes"><%= contact.notes.presence || "—" %></dd>
+  </div>
+</dl>

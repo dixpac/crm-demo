@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  first_name: Ada
+  last_name: Lovelace
+  email: ada@example.com
+  phone: "+44 20 7946 0958"
+  company: Analytical Engines Ltd.
+  job_title: Mathematician
+  address: 12 St. James's Square
+  city: London
+  state: England
+  postal_code: SW1Y 4LB
+  country: United Kingdom
+  notes: Priority contact
+
+two:
+  first_name: Grace
+  last_name: Hopper
+  email: grace@example.com
+  phone: "+1 212 555 0100"
+  company: Computing Corp.
+  job_title: Engineer
+  address: 123 Main Street
+  city: New York
+  state: NY
+  postal_code: 10001
+  country: United States
+  notes: Met at conference

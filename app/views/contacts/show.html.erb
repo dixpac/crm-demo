@@ -1,0 +1,18 @@
+<% content_for :title, @contact.full_name %>
+
+<div class="page-header">
+  <div>
+    <h1><%= @contact.full_name %></h1>
+    <p class="subtitle"><%= [@contact.job_title, @contact.company].select(&:present?).join(" at ").presence || "Contact details" %></p>
+  </div>
+  <%= link_to "Back to contacts", contacts_path, class: "button button-secondary" %>
+</div>
+
+<div class="panel detail-panel">
+  <%= render @contact %>
+</div>
+
+<div class="actions">
+  <%= link_to "Edit contact", edit_contact_path(@contact), class: "button" %>
+  <%= button_to "Delete contact", @contact, method: :delete, class: "button button-danger", data: { turbo_confirm: "Delete #{@contact.full_name}?" } %>
+</div>
