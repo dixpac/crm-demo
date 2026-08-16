@@ -1,35 +1,34 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-RUBY_VERSION="3.4.10"
-RUBY_PREFIX="/opt/ruby-${RUBY_VERSION}"
+# Install system dependencies (PostgreSQL + native gem extension prereqs + libvips)
+# apt-get install is idempotent, so run unconditionally to avoid partial installs.
+sudo apt-get update
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  build-essential curl libpq-dev libvips pkg-config postgresql \
+  postgresql-contrib
 
-if ! command -v psql >/dev/null || [[ ! -x "${RUBY_PREFIX}/bin/ruby" ]]; then
-  sudo apt-get update
-  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    build-essential curl libffi-dev libgmp-dev libjemalloc-dev libpq-dev \
-    libreadline-dev libssl-dev libyaml-dev pkg-config postgresql \
-    postgresql-contrib zlib1g-dev
+# Install mise if not already available
+if ! command -v mise >/dev/null; then
+  curl -fsSL https://mise.run | sh
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+MISE_BIN="$(command -v mise)"
+
+# Activate mise for future interactive shells (using resolved path)
+if ! grep -q "$MISE_BIN" "$HOME/.bashrc" 2>/dev/null; then
+  echo "eval \"\$($MISE_BIN activate bash)\"" >> "$HOME/.bashrc"
 fi
 
-if [[ ! -x "${RUBY_PREFIX}/bin/ruby" ]]; then
-  build_dir="$(mktemp -d "$HOME/ruby-build.XXXXXX")"
-  trap 'rm -rf "$build_dir"' EXIT
-  curl -fsSL "https://cache.ruby-lang.org/pub/ruby/3.4/ruby-${RUBY_VERSION}.tar.gz" |
-    tar -xz -C "$build_dir"
-  pushd "$build_dir/ruby-${RUBY_VERSION}" >/dev/null
-  ./configure --prefix="$RUBY_PREFIX" --disable-install-doc --with-jemalloc
-  make -j"$(nproc)"
-  sudo mkdir -p "$RUBY_PREFIX"
-  sudo chown -R "$(id -u):$(id -g)" "$RUBY_PREFIX"
-  make install-nodoc
-  popd >/dev/null
-fi
+# Install Ruby from mise.toml (binary-only — never fall back to source compilation)
+export MISE_RUBY_COMPILE=false
+mise install
 
-for executable in ruby gem bundle bundler; do
-  sudo ln -sf "$RUBY_PREFIX/bin/$executable" "/usr/local/bin/$executable"
-done
+# Activate mise for the current non-interactive script
+eval "$(mise env -s bash)"
+ruby --version
 
+# Start PostgreSQL and create a superuser role for the orb user
 sudo pg_ctlcluster 15 main start || true
 if ! sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname = '$USER'" | grep -qx 1; then
   sudo -u postgres createuser --superuser "$USER"
