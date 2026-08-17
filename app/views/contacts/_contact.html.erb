@@ -20,7 +20,7 @@
     <dd><%= [contact.address, contact.city, contact.state, contact.postal_code, contact.country].select(&:present?).join(", ").presence || "—" %></dd>
   </div>
   <div class="detail-item field-full">
-    <dt>Notes</dt>
+    <dt>Note</dt>
     <dd class="notes"><%= contact.notes.presence || "—" %></dd>
   </div>
 </dl>
